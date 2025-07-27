@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      position: relative;
+    }
+    
+    h2::after {
+      content: "";
+      display: block;
+      width: 60px;
+      height: 3px;
+      background: #3498db;
+      margin: 10px auto;
+    }
+    
+    .faq-item {
+      margin-bottom: 25px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 15px;
+    }
+    
+    h4 {
+      color: #3498db;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    h4::before {
+      content: "▸";
+      margin-right: 10px;
+      font-size: 1.2rem;
+      transition: transform 0.3s;
+    }
+    
+    h4.active::before {
+      transform: rotate(90deg);
+    }
+    
+    p {
+      margin: 0;
+      padding: 0 25px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      color: #555;
+    }
+    
+    .back-btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 10px 25px;
+      background-color: #3498db;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: all 0.3s;
+    }
+    
+    .back-btn:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Frequently Asked Questions</h2>
+    
+    <div class="faq-item">
+      <h4 onclick="toggleAnswer(this)">Q1: How is password strength calculated?</h4>
+      <p>We calculate strength using a combination of length, character variety (uppercase, lowercase, numbers, symbols), absence of common patterns, and resistance to dictionary attacks.</p>
+    </div>
+    
+    <div class="faq-item">
+      <h4 onclick="toggleAnswer(this)">Q2: Is my password stored anywhere?</h4>
+      <p>Absolutely not. This tool processes your password client-side only - it never leaves your browser or gets transmitted to any server.</p>
+    </div>
+    
+    <div class="faq-item">
+      <h4 onclick="toggleAnswer(this)">Q3: Is this free to use?</h4>
+      <p>Yes! This educational tool will always remain completely free to use, with no hidden costs or premium features.</p>
+    </div>
+    
+    <a href="/index.html" class="back-btn">Back to Home</a>
+  </div>
+
+  <script>
+    function toggleAnswer(element) {
+      element.classList.toggle('active');
+      const answer = element.nextElementSibling;
+      if (answer.style.maxHeight) {
+        answer.style.maxHeight = null;
+      } else {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const firstQuestion = document.querySelector('h4');
+      if (firstQuestion) {
+        toggleAnswer(firstQuestion);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SecurePass Generator | By Pardeep Kumar</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <style>
+    :root {
+      --primary: #1d3557;
+      --secondary: #457b9d;
+      --accent: #a8dadc;
+      --light: #f1faee;
+      --danger: #e63946;
+      --dark: #000;
+      --success: #06d6a0;
+      --warning: #ffb703;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 60px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .top-right-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+
+    .top-right-icon a {
+      color: var(--secondary);
+      font-size: 24px;
+      text-decoration: none;
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+    }
+
+    .password-display {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+      gap: 10px;
+    }
+
+    .password-input {
+      flex: 1;
+      padding: 10px;
+      font-size: 18px;
+      border: 2px solid var(--secondary);
+      border-radius: 8px;
+    }
+
+    .copy-btn {
+      padding: 10px 15px;
+      background-color: var(--accent);
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--secondary);
+      color: #fff;
+    }
+
+    .controls label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .controls input[type="range"] {
+      width: 100%;
+      margin: 5px 0;
+    }
+
+    .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 10px 0;
+    }
+
+    .checkboxes label {
+      flex: 1 1 45%;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-size: 18px;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .generate-btn:hover {
+      background-color: var(--secondary);
+    }
+
+    .strength-meter {
+      margin-top: 20px;
+    }
+
+    .strength-bar {
+      height: 10px;
+      background-color: var(--accent);
+      border-radius: 6px;
+      transition: width 0.3s ease;
+    }
+
+    .strength-label {
+      text-align: right;
+      font-size: 14px;
+      margin-top: 4px;
+      font-weight: bold;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--dark);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .copyright {
+      text-align: center;
+      font-size: 12px;
+      margin-top: 30px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-right-icon">
+      <a href="/index.html"><i class="fas fa-home"></i></a>
+    </div>
+    <h2>SecurePass Generator</h2>
+
+    <div class="password-display">
+      <input type="text" id="password" class="password-input" readonly>
+      <button id="copy-btn" class="copy-btn">Copy</button>
+    </div>
+
+    <div class="controls">
+      <label for="length-slider">Password Length: <span id="length-value">12</span></label>
+      <input type="range" id="length-slider" min="4" max="32" value="12">
+    </div>
+
+    <div class="checkboxes">
+      <label><input type="checkbox" id="uppercase" checked> Uppercase (A-Z)</label>
+      <label><input type="checkbox" id="lowercase" checked> Lowercase (a-z)</label>
+      <label><input type="checkbox" id="numbers" checked> Numbers (0-9)</label>
+      <label><input type="checkbox" id="symbols"> Symbols (!@#$%)</label>
+    </div>
+
+    <button id="generate-btn" class="generate-btn">Generate Password</button>
+
+    <div class="strength-meter">
+      <div id="strength-bar" class="strength-bar" style="width: 0%;"></div>
+      <div id="strength-value" class="strength-label"></div>
+    </div>
+    <div class="copyright">
+      © 2025 Pardeep Kumar. All rights reserved.
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Password copied to clipboard!</div>
+
+  <script>
+    const passwordInput = document.getElementById('password');
+    const copyBtn = document.getElementById('copy-btn');
+    const generateBtn = document.getElementById('generate-btn');
+    const lengthSlider = document.getElementById('length-slider');
+    const lengthValue = document.getElementById('length-value');
+    const uppercaseCheckbox = document.getElementById('uppercase');
+    const lowercaseCheckbox = document.getElementById('lowercase');
+    const numbersCheckbox = document.getElementById('numbers');
+    const symbolsCheckbox = document.getElementById('symbols');
+    const strengthBar = document.getElementById('strength-bar');
+    const strengthValue = document.getElementById('strength-value');
+    const toast = document.getElementById('toast');
+
+    const charSets = {
+      uppercase: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      lowercase: 'abcdefghijklmnopqrstuvwxyz',
+      numbers: '0123456789',
+      symbols: '!@#$%^&*()_+-=[]{}|;:,.<>?'
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      generatePassword();
+      lengthSlider.addEventListener('input', () => {
+        lengthValue.textContent = lengthSlider.value;
+        generatePassword();
+      });
+      [uppercaseCheckbox, lowercaseCheckbox, numbersCheckbox, symbolsCheckbox].forEach(cb => {
+        cb.addEventListener('change', generatePassword);
+      });
+      copyBtn.addEventListener('click', copyPassword);
+      generateBtn.addEventListener('click', generatePassword);
+    });
+
+    function generatePassword() {
+      let availableChars = '';
+      const selectedSets = [];
+      if (uppercaseCheckbox.checked) {
+        availableChars += charSets.uppercase;
+        selectedSets.push(charSets.uppercase);
+      }
+      if (lowercaseCheckbox.checked) {
+        availableChars += charSets.lowercase;
+        selectedSets.push(charSets.lowercase);
+      }
+      if (numbersCheckbox.checked) {
+        availableChars += charSets.numbers;
+        selectedSets.push(charSets.numbers);
+      }
+      if (symbolsCheckbox.checked) {
+        availableChars += charSets.symbols;
+        selectedSets.push(charSets.symbols);
+      }
+      if (availableChars.length === 0) {
+        showToast('Please select at least one character type!', 'error');
+        return;
+      }
+      const length = parseInt(lengthSlider.value);
+      let password = [];
+      selectedSets.forEach(set => {
+        password.push(set[Math.floor(Math.random() * set.length)]);
+      });
+      for (let i = password.length; i < length; i++) {
+        const randChar = availableChars[Math.floor(Math.random() * availableChars.length)];
+        password.push(randChar);
+      }
+      password = shuffleArray(password).join('');
+      passwordInput.value = password;
+      updatePasswordStrength(password, length, selectedSets.length);
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function copyPassword() {
+      const password = passwordInput.value;
+      if (!password) return;
+      navigator.clipboard.writeText(password).then(() => {
+        showToast('Password copied to clipboard!');
+      }).catch(() => {
+        showToast('Failed to copy password', 'error');
+      });
+    }
+
+    function updatePasswordStrength(password, length, variety) {
+      if (!password) {
+        strengthBar.style.width = '0%';
+        strengthValue.textContent = '';
+        return;
+      }
+      let strength = 0;
+      strength += Math.min(length / 32 * 50, 50);
+      strength += (variety / 4) * 30;
+      let complexity = 0;
+      if (/[A-Z]/.test(password)) complexity += 5;
+      if (/[a-z]/.test(password)) complexity += 5;
+      if (/[0-9]/.test(password)) complexity += 5;
+      if (/[^A-Za-z0-9]/.test(password)) complexity += 5;
+      strength += complexity;
+      strength = Math.min(strength, 100);
+      strengthBar.style.width = strength + '%';
+
+      if (strength < 40) {
+        strengthBar.style.backgroundColor = '#ef233c';
+        strengthValue.textContent = 'Weak';
+        strengthValue.style.color = '#ef233c';
+      } else if (strength < 70) {
+        strengthBar.style.backgroundColor = '#ff9f1c';
+        strengthValue.textContent = 'Medium';
+        strengthValue.style.color = '#ff9f1c';
+      } else if (strength < 90) {
+        strengthBar.style.backgroundColor = '#2ec4b6';
+        strengthValue.textContent = 'Strong';
+        strengthValue.style.color = '#2ec4b6';
+      } else {
+        strengthBar.style.backgroundColor = '#4361ee';
+        strengthValue.textContent = 'Very Strong';
+        strengthValue.style.color = '#4361ee';
+      }
+    }
+
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.style.background = type === 'error' ? 'var(--danger)' : (type === 'warning' ? 'var(--warning)' : 'var(--dark)');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>

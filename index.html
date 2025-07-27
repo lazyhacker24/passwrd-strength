@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Password Strength Checker</title>
+    <link
+    
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+</head>
+<body>
+    <nav class="top-nav">
+        <button onclick="location.href='/Account.html'">My Account</button>
+    </nav>
+
+    <main>
+        <div class="box">
+            <h2>Password Strength <span id="text">Check</span></h2>
+            <input type="password" id="password" placeholder="Enter Your Password" />
+            <i class="fas fa-eye eye-icon" id="togglePassword"></i>
+
+            <div id="crack-time"></div>
+
+            <div class="password-strength" id="strength-bar-1"></div>
+            <div class="password-strength" id="strength-bar-2"></div>
+            <div class="password-strength" id="strength-bar-3"></div>
+        </div>
+    </main>
+  <!-- © 2024-2025 Pardeep Kumar -->
+
+    <footer>
+        <div class="footer-left">
+            <a href="/faq.html">FAQ</a>
+            <a href="/tips.html">Tips</a>
+            <a href="/Old.html">Old</a>
+
+            
+        </div>
+        <div class="footer-center">
+            &copy; 2024-25 Pardeep. All rights reserved.
+        </div>
+        <div class="footer-right">
+        </div>
+
+
+
+
+    </footer>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const strengthText = document.getElementById('text');
+        const crackTime = document.getElementById('crack-time');
+        const togglePassword = document.getElementById('togglePassword');
+        const strengthBars = [
+            document.getElementById('strength-bar-1'),
+            document.getElementById('strength-bar-2'),
+            document.getElementById('strength-bar-3'),
+        ];
+
+        const charsetSize = (password) => {
+            let size = 0;
+            if (/[a-z]/.test(password)) size += 26;
+            if (/[A-Z]/.test(password)) size += 26;
+            if (/[0-9]/.test(password)) size += 10;
+            if (/[^a-zA-Z0-9]/.test(password)) size += 32;
+            return size;
+        };
+
+        const formatTime = (seconds) => {
+            if (seconds < 1) return "Instantly";
+            const units = [
+                { name: "year", value: 31536000 },
+                { name: "day", value: 86400 },
+                { name: "hour", value: 3600 },
+                { name: "minute", value: 60 },
+                { name: "second", value: 1 }
+            ];
+            let result = [];
+            for (const unit of units) {
+                const amt = Math.floor(seconds / unit.value);
+                if (amt > 0) {
+                    result.push(`${amt} ${unit.name}${amt > 1 ? "s" : ""}`);
+                    seconds -= amt * unit.value;
+                }
+                if (result.length === 2) break;
+            }
+            return result.join(", ");
+        };
+
+        passwordInput.addEventListener('input', function () {
+            const password = passwordInput.value;
+            if (!password) {
+                strengthText.textContent = '';
+                crackTime.textContent = '';
+                strengthBars.forEach(bar => (bar.style.background = '#222'));
+                return;
+            }
+
+            const length = password.length;
+            const charset = charsetSize(password);
+            const entropy = Math.log2(Math.pow(charset, length));
+            const guesses = Math.pow(2, entropy);
+            const attemptsPerSecond = 1e9; // 1 billion guesses per second
+            const seconds = guesses / attemptsPerSecond;
+            const timeToCrack = formatTime(seconds);
+
+            let strength = 0;
+            let color = '#ff2c1c';
+            let label = 'Weak';
+
+            const hasLower = /[a-z]/.test(password);
+            const hasUpper = /[A-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+            const repeatCheck = /(.)\1{2,}/.test(password);
+
+            if (length >= 8) strength++;
+            if (hasLower && hasUpper) strength++;
+            if (hasNumber && hasSpecial) strength++;
+            if (hasLower && hasUpper && hasNumber && hasSpecial && length >= 12) strength++;
+
+            if (repeatCheck) {
+                strength = 1;
+                label = 'Repetitive';
+                color = '#ff2c1c';
+            } else if (strength === 4) {
+                label = 'Very Strong';
+                color = '#007bff';
+            } else if (strength === 3) {
+                label = 'Strong';
+                color = '#12ff12';
+            } else if (strength === 2) {
+                label = 'Medium';
+                color = '#ff9800';
+            }
+
+            strengthText.textContent = label;
+            strengthText.style.color = color;
+            crackTime.textContent = `Estimated crack time: ${timeToCrack}`;
+            crackTime.style.color = '#ddd';
+
+            strengthBars.forEach((bar, index) => {
+                if (index < strength) {
+                    bar.style.background = color;
+                } else {
+                    bar.style.background = '#222';
+                }
+            });
+        });
+
+        togglePassword.addEventListener('click', function () {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                togglePassword.classList.remove('fa-eye');
+                togglePassword.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                togglePassword.classList.remove('fa-eye-slash');
+                togglePassword.classList.add('fa-eye');
+            }
+        });
+    </script>
+</body>
+</html>

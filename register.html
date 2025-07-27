@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+        }
+        
+        .left-section {
+            flex: 1;
+            padding: 40px;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .left-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .left-section p {
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .right-section {
+            flex: 1;
+            padding: 40px;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e1e1e1;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .tab.active {
+            color: #6e8efb;
+            border-bottom: 2px solid #6e8efb;
+        }
+        
+        .form-container {
+            display: none;
+        }
+        
+        .form-container.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #6e8efb;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            transition: opacity 0.3s;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+        
+        .forgot-password a {
+            color: #6e8efb;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            display: none;
+            padding: 20px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            margin-top: 20px;
+            color: #2e7d32;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .modal-close {
+            background: #6e8efb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left-section, .right-section {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1>Welcome Back!</h1>
+            <p>Manage your account with ease. Whether you're new here or already part of our community, we've got you covered.</p>
+            <img src="https://placehold.co/400x300" alt="Illustration of people interacting with digital interfaces on a modern platform with blue and purple color scheme">
+        </div>
+        <div class="right-section">
+            <div class="tab-container">
+                <div class="tab active" onclick="showForm('login')">Login</div>
+                <div class="tab" onclick="showForm('register')">Register</div>
+            </div>
+            
+            <div id="login-form" class="form-container active">
+                <div class="form-group">
+                    <label for="login-email">Email ID / Username</label>
+                    <input type="text" id="login-email" placeholder="Enter your email or username">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Enter your password">
+                </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button class="btn" onclick="loginUser()">Login</button>
+            </div>
+            
+            <div id="register-form" class="form-container">
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" placeholder="Enter your phone number">
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email Address</label>
+                    <input type="email" id="register-email" placeholder="Enter your email address">
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" placeholder="Create a password">
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm-password">Confirm Password</label>
+                    <input type="password" id="register-confirm-password" placeholder="Confirm your password">
+                </div>
+                <button class="btn" onclick="registerUser()">Sign Up</button>
+                
+                <div id="success-message" class="success-message">
+                    Your account registration request has been submitted successfully. The management team will review your details and approve your account soon. You will receive an email with your username once approved.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="approval-modal" class="modal">
+        <div class="modal-content">
+            <h2>Account Verification Pending</h2>
+            <p>Your details have been submitted successfully to our management team.</p>
+            <p>Your account verification is a manual process. Our team will review your information and approve your account soon.</p>
+            <p>Once approved, you'll receive an email with your username (your email address). Your password is what you've just created.</p>
+            <button class="modal-close" onclick="closeModal()">OK</button>
+        </div>
+    </div>
+    
+    <script>
+        function showForm(formType) {
+            // lazyhacker 
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`.tab:nth-child(${formType === 'login' ? 1 : 2})`).classList.add('active');
+            
+            // raj forms
+            document.getElementById('login-form').classList.remove('active');
+            document.getElementById('register-form').classList.remove('active');
+            document.getElementById(`${formType}-form`).classList.add('active');
+            
+            if (formType === 'login') {
+                document.getElementById('success-message').style.display = 'none';
+            }
+        }
+        
+        function loginUser() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // pardeep)
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            alert(`Login attempt for ${email}. In a real app, this would authenticate with the server.`);
+        }
+        
+        function registerUser() {
+            const name = document.getElementById('register-name').value;
+            const phone = document.getElementById('register-phone').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (!name || !phone || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            document.getElementById('success-message').style.display = 'block';
+            document.getElementById('approval-modal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('approval-modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
